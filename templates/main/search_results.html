@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Search Results for "{{ query }}"</h1>
+
+    <h2>Contacts ({{ results.contacts|length }})</h2>
+    {% if results.contacts %}
+    <ul>
+        {% for contact in results.contacts %}
+        <li><a href="{{ url_for('contacts.view_contact', contact_id=contact.id) }}">{{ contact.name }}</a> ({{ contact.email }})</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No contacts found matching your query.</p>
+    {% endif %}
+
+    <h2>Companies ({{ results.companies|length }})</h2>
+    {% if results.companies %}
+    <ul>
+        {% for company in results.companies %}
+        <li><a href="{{ url_for('companies.view_company', company_id=company.id) }}">{{ company.name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No companies found matching your query.</p>
+    {% endif %}
+
+    <h2>Deals ({{ results.deals|length }})</h2>
+    {% if results.deals %}
+    <ul>
+        {% for deal in results.deals %}
+        <li><a href="{{ url_for('deals.view_deal', deal_id=deal.id) }}">{{ deal.name }}</a> - {{ deal.stage.name }} ({{ '${:,.2f}'.format(deal.value) if deal.value else 'N/A' }})</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No deals found matching your query.</p>
+    {% endif %}
+
+    <p><a href="{{ request.referrer if request.referrer and request.referrer != request.url else url_for('users.index') }}">Back</a></p>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{{ deal.name }}</h1>
+    <p><strong>Stage:</strong> {{ deal.stage.name }}</p>
+    <p><strong>Value:</strong> {{ '${:,.2f}'.format(deal.value) if deal.value else 'N/A' }}</p>
+    <p><strong>Probability:</strong> {{ deal.probability ~ '%' if deal.probability is not none else 'N/A' }}</p>
+    <p><strong>Expected Close Date:</strong> {{ deal.expected_close_date.strftime('%Y-%m-%d') if deal.expected_close_date else 'N/A' }}</p>
+    <p><strong>Associated Company:</strong> {% if deal.company %}<a href="{{ url_for('companies.view_company', company_id=deal.company.id) }}">{{ deal.company.name }}</a>{% else %}N/A{% endif %}</p>
+    <p><strong>Associated Contact:</strong> {% if deal.contact %}<a href="{{ url_for('contacts.view_contact', contact_id=deal.contact.id) }}">{{ deal.contact.name }}</a>{% else %}N/A{% endif %}</p>
+    <p><i>Created: {{ deal.created_at.strftime('%Y-%m-%d %H:%M') }}</i></p>
+    <p><i>Last Updated: {{ deal.updated_at.strftime('%Y-%m-%d %H:%M') }}</i></p>
+    <p>
+        <a href="{{ url_for('deals.edit_deal', deal_id=deal.id) }}">Edit Deal</a> |
+        <a href="{{ url_for('deals.pipeline_view') }}">Back to Pipeline</a> |
+        <a href="{{ url_for('deals.list_deals') }}">Back to Deals List</a>
+    </p>
+<p><a href="{{ url_for('activities.create_activity', deal_id=deal.id) }}">Log Activity for this Deal</a></p>
+{% endblock %}

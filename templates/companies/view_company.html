@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{{ company.name }}</h1>
+    <p><strong>Industry:</strong> {{ company.industry if company.industry else 'N/A' }}</p>
+    <p><strong>Website:</strong> <a href="{{ company.website }}" target="_blank">{{ company.website }}</a></p>
+    <p><strong>Address:</strong><br>{{ company.address|nl2br if company.address else 'N/A' }}</p>
+    <p><strong>Primary Contact:</strong> {{ company.primary_contact_name if company.primary_contact_name else 'N/A' }}</p>
+    <p><i>Created: {{ company.created_at.strftime('%Y-%m-%d %H:%M') }}</i></p>
+    <p><i>Last Updated: {{ company.updated_at.strftime('%Y-%m-%d %H:%M') }}</i></p>
+    <hr>
+    <h3>Associated Contacts ({{ company.contacts.count() }})</h3>
+    <ul>
+        {% for contact in company.contacts %}
+        <li><a href="{{ url_for('contacts.view_contact', contact_id=contact.id) }}">{{ contact.name }}</a> ({{ contact.email }})</li>
+        {% else %}
+        <li>No contacts associated with this company yet.</li>
+        {% endfor %}
+    </ul>
+    <p>
+        <a href="{{ url_for('companies.edit_company', company_id=company.id) }}">Edit Company</a> |
+        <a href="{{ url_for('companies.list_companies') }}">Back to Companies List</a>
+    </p>
+<p><a href="{{ url_for('activities.create_activity', company_id=company.id) }}">Log Activity for this Company</a></p>
+{% endblock %}

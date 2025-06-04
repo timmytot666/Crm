@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>{{ form.name.label }}<br>{{ form.name(size=60) }}{% for error in form.name.errors %}<span style='color:red;'>[{{error}}]</span>{% endfor %}</p>
+        <p>{{ form.email.label }}<br>{{ form.email(size=60) }}{% for error in form.email.errors %}<span style='color:red;'>[{{error}}]</span>{% endfor %}</p>
+        <p>{{ form.phone_primary.label }}<br>{{ form.phone_primary(size=30) }}</p>
+        <p>{{ form.phone_secondary.label }}<br>{{ form.phone_secondary(size=30) }}</p>
+        <p>{{ form.company_id.label }}<br>{{ form.company_id() }}{% for error in form.company_id.errors %}<span style='color:red;'>[{{error}}]</span>{% endfor %}</p>
+        <p>{{ form.address.label }}<br>{{ form.address(cols=58, rows=4) }}</p>
+        <p>{{ form.tags.label }}<br>{{ form.tags(size=60) }}</p>
+        <p>{{ form.interaction_history.label }}<br>{{ form.interaction_history(cols=58, rows=5) }}</p>
+        <p>{{ form.submit() }} <a href="{{ url_for('contacts.list_contacts') }}">Cancel</a></p>
+    </form>
+{% endblock %}

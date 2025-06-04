@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <p><a href="{{ url_for('deals.create_deal') }}">Create New Deal</a></p>
+    <p><a href="{{ url_for('deals.pipeline_view') }}">Pipeline View</a></p>
+    {% if deals %}
+    <table><thead><tr><th>Name</th><th>Stage</th><th>Value</th><th>Close Date</th><th>Company</th><th>Contact</th><th>Actions</th></tr></thead><tbody>
+        {% for deal in deals %}
+        <tr>
+            <td><a href="{{ url_for('deals.view_deal', deal_id=deal.id) }}">{{ deal.name }}</a></td>
+            <td>{{ deal.stage.name }}</td>
+            <td>{{ '${:,.2f}'.format(deal.value) if deal.value else 'N/A' }}</td>
+            <td>{{ deal.expected_close_date.strftime('%Y-%m-%d') if deal.expected_close_date else 'N/A' }}</td>
+            <td>{{ deal.company.name if deal.company else 'N/A' }}</td>
+            <td>{{ deal.contact.name if deal.contact else 'N/A' }}</td>
+            <td><a href="{{ url_for('deals.edit_deal', deal_id=deal.id) }}">Edit</a></td>
+        </tr>
+        {% endfor %}
+    </tbody></table>
+    {% else %}
+    <p>No deals found.</p>
+    {% endif %}
+{% endblock %}

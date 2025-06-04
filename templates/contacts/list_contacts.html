@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Contacts</h1>
+    <p><a href="{{ url_for('contacts.create_contact') }}">Create New Contact</a></p>
+    <ul>
+        {% for contact in contacts %}
+        <li>
+            <a href="{{ url_for('contacts.view_contact', contact_id=contact.id) }}">{{ contact.name }}</a> ({{ contact.email }})
+            - <a href="{{ url_for('contacts.edit_contact', contact_id=contact.id) }}">Edit</a>
+            - <form method="post" action="{{ url_for('contacts.delete_contact', contact_id=contact.id) }}" style="display:inline;">
+                  <input type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+              </form>
+        </li>
+        {% else %}
+        <li>No contacts found.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

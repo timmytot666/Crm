@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{{ title if title else 'CRM MVP' }} - CRM</title>
+  </head>
+  <body>
+    <div>
+      CRM Navigation:
+      <a href="{{ url_for('contacts.list_contacts') }}">Contacts</a> |
+      <a href="{{ url_for('companies.list_companies') }}">Companies</a> |
+      <a href="{{ url_for('deals.pipeline_view') }}">Deals Pipeline</a> |
+      <a href="{{ url_for('activities.list_activities') }}">Activities</a> |
+      <a href="{{ url_for('users.index') if current_user.is_authenticated else url_for('users.login') }}">Home/Profile</a>
+      <form method="get" action="{{ url_for('main.search') }}" style="display: inline-block; margin-left: 20px;"><input type="search" name="q" placeholder="Search..." value="{{ request.args.get('q', '') }}"><input type="submit" value="Search"></form>
+      {% if current_user.is_anonymous %}
+      | <a href="{{ url_for('users.login') }}">Login</a>
+      | <a href="{{ url_for('users.register') }}">Register</a>
+      {% else %}
+      | <a href="{{ url_for('users.logout') }}">Logout</a>
+      {% endif %}
+    </div>
+    <hr>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{{ activity.subject }} {% if activity.completed_at %}(Completed){% endif %}</h1>
+    <p><strong>Type:</strong> {{ activity.activity_type }}</p>
+    <p><strong>Due Date:</strong> {{ activity.due_date.strftime('%Y-%m-%d %H:%M') if activity.due_date else 'N/A' }}</p>
+    <p><strong>Notes:</strong><br>{{ activity.notes|nl2br if activity.notes else 'N/A' }}</p>
+    <p><strong>Associated Contact:</strong> {% if activity.contact %}<a href="{{ url_for('contacts.view_contact', contact_id=activity.contact.id) }}">{{ activity.contact.name }}</a>{% else %}N/A{% endif %}</p>
+    <p><strong>Associated Company:</strong> {% if activity.company %}<a href="{{ url_for('companies.view_company', company_id=activity.company.id) }}">{{ activity.company.name }}</a>{% else %}N/A{% endif %}</p>
+    <p><strong>Associated Deal:</strong> {% if activity.deal %}<a href="{{ url_for('deals.view_deal', deal_id=activity.deal.id) }}">{{ activity.deal.name }}</a>{% else %}N/A{% endif %}</p>
+    <p><i>Logged by: {{ activity.user.username if activity.user else 'N/A' }} on {{ activity.created_at.strftime('%Y-%m-%d %H:%M') }}</i></p>
+    <p><i>Last Updated: {{ activity.updated_at.strftime('%Y-%m-%d %H:%M') }}</i></p>
+    {% if activity.completed_at %}<p><i>Completed: {{ activity.completed_at.strftime('%Y-%m-%d %H:%M') }}</i></p>{% endif %}
+    <p>
+        <a href="{{ url_for('activities.edit_activity', activity_id=activity.id) }}">Edit Activity</a> |
+        <a href="{{ url_for('activities.list_activities') }}">Back to Activities List</a>
+        {% if activity.activity_type == 'Task' and not activity.completed_at %}
+        <form method="post" action="{{ url_for('activities.complete_activity', activity_id=activity.id) }}" style="display:inline; margin-left: 10px;">
+             <input type="submit" value="Mark as Complete">
+        </form>
+        {% elif activity.activity_type == 'Task' and activity.completed_at %}
+        <form method="post" action="{{ url_for('activities.complete_activity', activity_id=activity.id) }}" style="display:inline; margin-left: 10px;">
+             <input type="submit" value="Mark as Incomplete">
+        </form>
+        {% endif %}
+    </p>
+{% endblock %}

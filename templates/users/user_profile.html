@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>User Profile</h1>
+    <p>Username: {{ current_user.username }}</p>
+    <p>Email: {{ current_user.email }}</p>
+    <p>Role: {{ current_user.role.name if current_user.role else 'No role assigned' }}</p>
+    <p><a href="{{ url_for('users.logout') }}">Logout</a></p>
+{% endblock %}

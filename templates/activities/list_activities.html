@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <p><a href="{{ url_for('activities.create_activity') }}">Log New Activity/Task</a></p>
+    {% if activities %}
+    <table><thead><tr><th>Subject</th><th>Type</th><th>Due Date</th><th>Completed</th><th>Associated With</th><th>Actions</th></tr></thead><tbody>
+        {% for activity in activities %}
+        <tr {% if activity.completed_at %}style='text-decoration: line-through; color: grey;'{% endif %}>
+            <td><a href="{{ url_for('activities.view_activity', activity_id=activity.id) }}">{{ activity.subject }}</a></td>
+            <td>{{ activity.activity_type }}</td>
+            <td>{{ activity.due_date.strftime('%Y-%m-%d %H:%M') if activity.due_date else 'N/A' }}</td>
+            <td>
+                {% if activity.activity_type == 'Task' %}
+                <form method="post" action="{{ url_for('activities.complete_activity', activity_id=activity.id) }}" style="display:inline;">
+                    <input type="submit" value="{{ 'Undo' if activity.completed_at else 'Complete' }}">
+                </form>
+                {% else %}
+                {{ 'Yes' if activity.completed_at else ('N/A' if not activity.due_date else 'Pending') }}
+                {% endif %}
+            </td>
+            <td>
+                {% if activity.contact %}<a href="{{ url_for('contacts.view_contact', contact_id=activity.contact.id) }}">C: {{ activity.contact.name }}</a><br>{% endif %}
+                {% if activity.company %}<a href="{{ url_for('companies.view_company', company_id=activity.company.id) }}">Co: {{ activity.company.name }}</a><br>{% endif %}
+                {% if activity.deal %}<a href="{{ url_for('deals.view_deal', deal_id=activity.deal.id) }}">D: {{ activity.deal.name }}</a>{% endif %}
+            </td>
+            <td><a href="{{ url_for('activities.edit_activity', activity_id=activity.id) }}">Edit</a></td>
+        </tr>
+        {% endfor %}
+    </tbody></table>
+    {% else %}
+    <p>No activities found.</p>
+    {% endif %}
+{% endblock %}

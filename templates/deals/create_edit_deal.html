@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>{{ form.name.label }}<br>{{ form.name(size=60) }}{% for e in form.name.errors %}<span style='color:red;'>[{{e}}]</span>{% endfor %}</p>
+        <p>{{ form.pipeline_stage_id.label }}<br>{{ form.pipeline_stage_id() }}{% for e in form.pipeline_stage_id.errors %}<span style='color:red;'>[{{e}}]</span>{% endfor %}</p>
+        <p>{{ form.value.label }}<br>{{ form.value(size=20) }}{% for e in form.value.errors %}<span style='color:red;'>[{{e}}]</span>{% endfor %}</p>
+        <p>{{ form.expected_close_date.label }} (YYYY-MM-DD)<br>{{ form.expected_close_date() }}{% for e in form.expected_close_date.errors %}<span style='color:red;'>[{{e}}]</span>{% endfor %}</p>
+        <p>{{ form.probability.label }}<br>{{ form.probability(size=5) }}{% for e in form.probability.errors %}<span style='color:red;'>[{{e}}]</span>{% endfor %}</p>
+        <p>{{ form.company_id.label }}<br>{{ form.company_id() }}{% for e in form.company_id.errors %}<span style='color:red;'>[{{e}}]</span>{% endfor %}</p>
+        <p>{{ form.contact_id.label }}<br>{{ form.contact_id() }}{% for e in form.contact_id.errors %}<span style='color:red;'>[{{e}}]</span>{% endfor %}</p>
+        <p>{{ form.submit() }} <a href="{{ request.referrer if request.referrer else url_for('deals.pipeline_view') }}">Cancel</a></p>
+    </form>
+{% endblock %}
