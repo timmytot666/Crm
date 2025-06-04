@@ -9,10 +9,12 @@
     <p><strong>Associated Contact:</strong> {% if deal.contact %}<a href="{{ url_for('contacts.view_contact', contact_id=deal.contact.id) }}">{{ deal.contact.name }}</a>{% else %}N/A{% endif %}</p>
     <p><i>Created: {{ deal.created_at.strftime('%Y-%m-%d %H:%M') }}</i></p>
     <p><i>Last Updated: {{ deal.updated_at.strftime('%Y-%m-%d %H:%M') }}</i></p>
+
     <p>
+        <a href="{{ mailto_link | safe }}" target="_blank">Share via Email</a> |
         <a href="{{ url_for('deals.edit_deal', deal_id=deal.id) }}">Edit Deal</a> |
         <a href="{{ url_for('deals.pipeline_view') }}">Back to Pipeline</a> |
         <a href="{{ url_for('deals.list_deals') }}">Back to Deals List</a>
     </p>
-<p><a href="{{ url_for('activities.create_activity', deal_id=deal.id) }}">Log Activity for this Deal</a></p>
+    <p><a href="{{ url_for('activities.create_activity', deal_id=deal.id) }}">Log Activity for this Deal</a></p>
 {% endblock %}

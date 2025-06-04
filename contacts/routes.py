@@ -3,13 +3,14 @@ from flask_login import login_required, current_user
 from app import db
 from contacts.models import Contact
 from contacts.forms import ContactForm
+from urllib.parse import quote_plus
+from common.utils import generate_entity_email_body
 
 contacts_bp = Blueprint('contacts', __name__, template_folder='../templates/contacts')
 
 @contacts_bp.route('/')
 @login_required
 def list_contacts():
-    # Query contacts belonging to the current user for now
     contacts = Contact.query.filter_by(user_id=current_user.id).all()
     return render_template('list_contacts.html', contacts=contacts, title='Contacts')
 
@@ -40,7 +41,12 @@ def create_contact():
 def view_contact(contact_id):
     contact = Contact.query.get_or_404(contact_id)
     # Add check: if contact.user_id != current_user.id: abort(403)
-    return render_template('view_contact.html', contact=contact, title=contact.name)
+
+    email_subject = f"CRM Contact Information: {contact.name}"
+    email_body = generate_entity_email_body(contact)
+    mailto_link = f"mailto:?subject={quote_plus(email_subject)}&body={quote_plus(email_body)}".replace('+', '%20')
+
+    return render_template('view_contact.html', contact=contact, title=contact.name, mailto_link=mailto_link)
 
 @contacts_bp.route('/<int:contact_id>/edit', methods=['GET', 'POST'])
 @login_required

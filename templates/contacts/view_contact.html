@@ -10,9 +10,11 @@
     <p><strong>Interaction History:</strong><br>{{ contact.interaction_history|nl2br if contact.interaction_history else 'None logged' }}</p>
     <p><i>Created: {{ contact.created_at.strftime('%Y-%m-%d %H:%M') }}</i></p>
     <p><i>Last Updated: {{ contact.updated_at.strftime('%Y-%m-%d %H:%M') }}</i></p>
+
     <p>
+        <a href="{{ mailto_link | safe }}" target="_blank">Share via Email</a> |
         <a href="{{ url_for('contacts.edit_contact', contact_id=contact.id) }}">Edit Contact</a> |
         <a href="{{ url_for('contacts.list_contacts') }}">Back to Contacts List</a>
     </p>
-<p><a href="{{ url_for('activities.create_activity', contact_id=contact.id) }}">Log Activity for this Contact</a></p>
+    <p><a href="{{ url_for('activities.create_activity', contact_id=contact.id) }}">Log Activity for this Contact</a></p>
 {% endblock %}

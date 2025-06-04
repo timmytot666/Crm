@@ -9,16 +9,20 @@
         .stage-total { font-weight: bold; margin-top: 10px; }
     </style>
     <h1>Deal Pipeline</h1>
-    <p><a href="{{ url_for('deals.create_deal') }}">Create New Deal</a> | <a href="{{ url_for('deals.list_deals') }}">List View</a></p>
+    <p>
+        <a href="{{ pipeline_mailto_link | safe }}" target="_blank">Share Pipeline Summary via Email</a> |
+        <a href="{{ url_for('deals.create_deal') }}">Create New Deal</a> |
+        <a href="{{ url_for('deals.list_deals') }}">List View</a>
+    </p>
     <div class="pipeline">
         {% for stage in stages %}
         <div class="pipeline-stage">
             <h3>{{ stage.name }}</h3>
-            <p class="stage-total">Total Value: {{ '${:,.2f}'.format(stage_totals[stage.id]) }}</p>
+            <p class="stage-total">Total Value: {{ '${:,.2f}'.format(stage_totals[stage.id]) }}</p> {# Assuming stage_totals are Decimal or float #}
             {% for deal in deals_by_stage[stage.id] %}
             <div class="deal-card">
                 <p><strong><a href="{{ url_for('deals.view_deal', deal_id=deal.id) }}">{{ deal.name }}</a></strong></p>
-                <p>Value: {{ '${:,.2f}'.format(deal.value) if deal.value else 'N/A' }}</p>
+                <p>Value: {{ '${:,.2f}'.format(deal.value) if deal.value is not none else 'N/A' }}</p>
                 <p>Company: {{ deal.company.name if deal.company else 'N/A' }}</p>
                 <p>Contact: {{ deal.contact.name if deal.contact else 'N/A' }}</p>
                 <p><a href="{{ url_for('deals.edit_deal', deal_id=deal.id) }}">Edit</a></p>

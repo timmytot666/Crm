@@ -3,11 +3,14 @@ from flask_login import login_required, current_user
 from app import db
 from deals.models import Deal, PipelineStage
 from deals.forms import DealForm
-from sqlalchemy import func # For sum in pipeline view
+from urllib.parse import quote_plus
+from common.utils import generate_entity_email_body, generate_pipeline_summary_email_body # Added new import
+from sqlalchemy import func
+from decimal import Decimal # Ensure Decimal is available for stage_totals sums
 
 deals_bp = Blueprint('deals', __name__, template_folder='../templates/deals')
 
-@deals_bp.route('/') # This will be the list view
+@deals_bp.route('/')
 @login_required
 def list_deals():
     deals = Deal.query.filter_by(user_id=current_user.id).order_by(Deal.expected_close_date.desc()).all()
@@ -22,8 +25,14 @@ def pipeline_view():
     for stage in stages:
         deals_in_stage = Deal.query.filter_by(user_id=current_user.id, pipeline_stage_id=stage.id).all()
         deals_by_stage[stage.id] = deals_in_stage
-        stage_totals[stage.id] = sum(d.value for d in deals_in_stage if d.value) or 0
-    return render_template('pipeline_view.html', stages=stages, deals_by_stage=deals_by_stage, stage_totals=stage_totals, title='Deal Pipeline')
+        # Ensure values are Decimal for sum, or handle None
+        stage_totals[stage.id] = sum(deal.value for deal in deals_in_stage if deal.value is not None) or Decimal(0)
+
+    pipeline_email_subject = "CRM - Deal Pipeline Summary"
+    pipeline_email_body = generate_pipeline_summary_email_body(stages, deals_by_stage, stage_totals)
+    pipeline_mailto_link = f"mailto:?subject={quote_plus(pipeline_email_subject)}&body={quote_plus(pipeline_email_body)}".replace('+', '%20')
+
+    return render_template('pipeline_view.html', stages=stages, deals_by_stage=deals_by_stage, stage_totals=stage_totals, title='Deal Pipeline', pipeline_mailto_link=pipeline_mailto_link)
 
 @deals_bp.route('/create', methods=['GET', 'POST'])
 @login_required
@@ -50,14 +59,17 @@ def create_deal():
 @login_required
 def view_deal(deal_id):
     deal = Deal.query.get_or_404(deal_id)
-    # Add authorization check: if deal.user_id != current_user.id: abort(403)
-    return render_template('view_deal.html', deal=deal, title=deal.name)
+
+    email_subject = f"CRM Deal Information: {deal.name}"
+    email_body = generate_entity_email_body(deal)
+    mailto_link = f"mailto:?subject={quote_plus(email_subject)}&body={quote_plus(email_body)}".replace('+', '%20')
+
+    return render_template('view_deal.html', deal=deal, title=deal.name, mailto_link=mailto_link)
 
 @deals_bp.route('/<int:deal_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_deal(deal_id):
     deal = Deal.query.get_or_404(deal_id)
-    # Add authorization check
     form = DealForm(obj=deal)
     if form.validate_on_submit():
         deal.name = form.name.data
@@ -76,7 +88,6 @@ def edit_deal(deal_id):
 @login_required
 def delete_deal(deal_id):
     deal = Deal.query.get_or_404(deal_id)
-    # Add authorization check
     db.session.delete(deal)
     db.session.commit()
     flash('Deal deleted successfully!', 'success')

@@ -4,6 +4,8 @@ from app import db
 from companies.models import Company
 from companies.forms import CompanyForm
 from contacts.models import Contact # For listing contacts of a company
+from urllib.parse import quote_plus
+from common.utils import generate_entity_email_body
 
 companies_bp = Blueprint('companies', __name__, template_folder='../templates/companies')
 
@@ -37,7 +39,12 @@ def create_company():
 def view_company(company_id):
     company = Company.query.get_or_404(company_id)
     # Add check for user_id if necessary for authorization
-    return render_template('view_company.html', company=company, title=company.name)
+
+    email_subject = f"CRM Company Information: {company.name}"
+    email_body = generate_entity_email_body(company)
+    mailto_link = f"mailto:?subject={quote_plus(email_subject)}&body={quote_plus(email_body)}".replace('+', '%20')
+
+    return render_template('view_company.html', company=company, title=company.name, mailto_link=mailto_link)
 
 @companies_bp.route('/<int:company_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -61,10 +68,13 @@ def edit_company(company_id):
 def delete_company(company_id):
     company = Company.query.get_or_404(company_id)
     # Add check for user_id
-    # Also consider what to do with contacts linked to this company (e.g., set company_id to null, or prevent deletion if contacts exist)
     if company.contacts.count() > 0:
         flash('Cannot delete company: it has associated contacts. Please reassign or delete them first.', 'danger')
         return redirect(url_for('companies.list_companies'))
+    # Add similar check for deals associated with company if that relationship exists and is important
+    # if company.deals.count() > 0:
+    #     flash('Cannot delete company: it has associated deals. Please reassign or delete them first.', 'danger')
+    #     return redirect(url_for('companies.list_companies'))
     db.session.delete(company)
     db.session.commit()
     flash('Company deleted successfully!', 'success')

@@ -17,8 +17,9 @@
         {% endfor %}
     </ul>
     <p>
+        <a href="{{ mailto_link | safe }}" target="_blank">Share via Email</a> |
         <a href="{{ url_for('companies.edit_company', company_id=company.id) }}">Edit Company</a> |
         <a href="{{ url_for('companies.list_companies') }}">Back to Companies List</a>
     </p>
-<p><a href="{{ url_for('activities.create_activity', company_id=company.id) }}">Log Activity for this Company</a></p>
+    <p><a href="{{ url_for('activities.create_activity', company_id=company.id) }}">Log Activity for this Company</a></p>
 {% endblock %}
